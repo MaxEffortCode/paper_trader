@@ -11,30 +11,129 @@ from datetime import datetime, date, time
 pytrend = TrendReq(hl='en-US', tz=360)
 
 all_keywords = ['msft','sony','aapl','amzn']
-
 keywords = []
+user_keywords = []
 
 timeframes = ['today 5-y','today 12-m','today 3-m','today 1-m']
-print('Select how far back you would like to research the trends.')
-x = int(input('1) 5 years 2) 12 months 3) 3 months 4) 1 month: ')) - 1
+timeframe_ref = 0
 
-while x > 3 or x < 0:
-    x = int(input('ok ret**d, pick a number between 1 and 4: ')) - 1
+
+def main():
+    #Call def here
+    #user_prompt(timeframe_ref,user_keywords)
+    user_keywords = user_prompt_keywords()
+    timeframe_ref = user_prompt_timeframe()
+
+
+
+    #evaluate each keyword individually
+    if user_keywords == []:
+        for kw in all_keywords:
+            keywords.append(kw)
+            check_trends(kw,user_keywords,timeframe_ref)
+            keywords.pop()
+    else:
+        for kw in user_keywords:
+            keywords.append(kw)
+            check_trends(kw,user_keywords,timeframe_ref)
+            keywords.pop()
+
+    print()
+    reset = input('Would you like to make another trend analysis?: y/n ')
+    if reset == 'y':
+        main()
+    else:
+        print('goodbye')
+
+#Not Used
+def user_prompt(x,y):
+    counter = 1
+    custom_keywords = input('Would you like to use your own keywords to evaluate search trends?: y/n ')
+    
+    #User Prompt Exception
+    while custom_keywords != 'y' and custom_keywords != 'n':
+        print(exception_handler(0))
+        custom_keywords = input()
+    #Custom keywords added here
+    while custom_keywords == 'y':
+        y =+ str(input('Type in keyword ' + counter + ': '))
+        counter =+ 1
+        custom_keywords = input('Add another keyword? y/n')
+
+
+    print('Select how far back you would like to research the trends.')
+    x = int(input('1) 5 years 2) 12 months 3) 3 months 4) 1 month: ')) - 1
+    #User Prompt Exception
+    while x > 3 or x < 0:
+        print(exception_handler(1))
+        x = int(input()) - 1
+
+    return x,y
+
+#Timeframe Input
+def user_prompt_timeframe():
+    print('Select how far back you would like to research the trends.')
+    try:
+        x = int(input('1) 5 years 2) 12 months 3) 3 months 4) 1 month: ')) - 1
+    except:
+        x = -1
+
+    #User Prompt Exception
+    while x > 3 or x < 0:
+        print(exception_handler(1))
+        try:
+            x = int(input()) - 1
+        except:
+            x = -1
+
+    return x
+
+#Keyword Input
+def user_prompt_keywords():
+    x = []
+    counter = 0
+    custom_keywords = input('Would you like to use your own keywords to evaluate search trends?: y/n ')
+    
+    #User Prompt Exception
+    while custom_keywords != 'y' and custom_keywords != 'n':
+        print(exception_handler(0))
+        custom_keywords = input()
+    #Custom keywords added here
+    while custom_keywords == 'y':
+        x.append(str(input('Type in keyword ' + str(counter + 1) + ': ')))
+        counter = counter + 1
+        custom_keywords = input('Add another keyword? y/n ')
+        while custom_keywords != 'y' and custom_keywords != 'n':
+             print(exception_handler(0))
+             custom_keywords = input()
+
+    return x
+
+
+#Exception Handler Prompts
+def exception_handler(a):
+    switcher = {
+        0: "ok ret**d, type y or n:  ",
+        1: "ok ret**d, pick a number between 1 and 4:  ",
+        2: "This is Case Two ",
+    }
+    return switcher.get(a, 'Invalid exception switch')
+
 
 #Checks the trends
-def check_trends():
-    pytrend.build_payload(keywords, cat=0, timeframe = timeframes[x],  geo='US')
-
+def check_trends(kw,user_keywords,timeframe_ref):
+    print()
+    pytrend.build_payload(keywords, cat=0, timeframe = timeframes[timeframe_ref],  geo='US')
 
     data = pytrend.interest_over_time()
-    #print(data)
 
     #Average interest per week over the entire time period
     mean = round(data.mean(numeric_only=True),2)
 
     print('The average of ' + kw + ': ' +str(mean[kw]))
+
     #if statment triggered if the time frame is 5 years
-    if x == 0:
+    if timeframe_ref == 0:
         #avg for the most recent year
         avg = round(data[kw][-52:].mean(),2)
         #avg for the first year starting five years ago
@@ -77,10 +176,17 @@ def check_trends():
         else:
             print('Trend Evaluation needs to be refined')
 
+        #Comparison Last Year vs 5 Years ago
+        if avg2 == 0:
+            print('This didn\'t exist 5 years ago.')
+        elif trend2 > 15:
+            print('The last year interest is significantly higher compared to 5 years ago.' + ' It has changed by ' + str(trend2) + '%.')
+        elif trend2 < 15:
+            print('The last year interest is significantly lower compared to 5 years ago.' + ' It has changed by ' + str(trend2) + '%.')
+        else:
+            print('The last year interest has slightly changed compared to 5 years ago.' + ' It has changed by ' + str(trend2) + '%.')
 
-#evaluate each keyword individually
-for kw in all_keywords:
-    keywords.append(kw)
-    check_trends()
-    keywords.pop()
+main()
+
+
 
