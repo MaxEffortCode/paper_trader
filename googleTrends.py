@@ -19,7 +19,7 @@ timeframe_ref = 0
 
 
 def main():
-    #Call def here
+    #Call def here  
     #user_prompt(timeframe_ref,user_keywords)
     user_keywords = user_prompt_keywords()
     timeframe_ref = user_prompt_timeframe()
@@ -113,8 +113,8 @@ def user_prompt_keywords():
 #Exception Handler Prompts
 def exception_handler(a):
     switcher = {
-        0: "ok ret**d, type y or n:  ",
-        1: "ok ret**d, pick a number between 1 and 4:  ",
+        0: "wrong input, type y or n:  ",
+        1: "wrong input, pick a number between 1 and 4:  ",
         2: "This is Case Two ",
     }
     return switcher.get(a, 'Invalid exception switch')
