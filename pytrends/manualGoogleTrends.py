@@ -17,12 +17,7 @@ user_keywords = []
 timeframes = ['today 5-y','today 12-m','today 3-m','today 1-m']
 timeframe_ref = 0
 
-colnames = ["keywords"]
-df = pd.read_csv("pytrends\keyword_list.csv", names=colnames)
-df2 = df["keywords"].values.tolist()
-df2.remove("Keywords")
 
-dataset = []
 
 def main():
     #Call def here  
@@ -132,15 +127,13 @@ def check_trends(kw,user_keywords,timeframe_ref):
     pytrend.build_payload(keywords, cat=0, timeframe = timeframes[timeframe_ref],  geo='US')
 
     data = pytrend.interest_over_time()
-    data.to_csv('pytrends.csv')
 
     #Average interest per week over the entire time period
     mean = round(data.mean(numeric_only=True),2)
 
-    print(data)
     print('The average of ' + kw + ': ' +str(mean[kw]))
 
-    """#if statment triggered if the time frame is 5 years
+    #if statment triggered if the time frame is 5 years
     if timeframe_ref == 0:
         #avg for the most recent year
         avg = round(data[kw][-52:].mean(),2)
@@ -193,7 +186,7 @@ def check_trends(kw,user_keywords,timeframe_ref):
             print('The last year interest is significantly lower compared to 5 years ago.' + ' It has changed by ' + str(trend2) + '%.')
         else:
             print('The last year interest has slightly changed compared to 5 years ago.' + ' It has changed by ' + str(trend2) + '%.')
-            """
+            
 
 
 
